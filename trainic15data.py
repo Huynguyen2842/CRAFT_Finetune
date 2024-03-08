@@ -14,24 +14,20 @@ import torch.optim as optim
 import random
 import h5py
 import re
-import water
 from test import test
-
 
 from math import exp
 from data_loader import ICDAR2015, Synth80k, ICDAR2013
 
 ###import file#######
-from augmentation import random_rot, crop_img_bboxes
-from gaussianmap import gaussion_transform, four_point_transform
-from generateheatmap import add_character, generate_target, add_affinity, generate_affinity, sort_box, real_affinity, generate_affinity_box
+# from augmentation import random_rot, crop_img_bboxes
+# from gaussianmap import gaussion_transform, four_point_transform
+# from generateheatmap import add_character, generate_target, add_affinity, generate_affinity, sort_box, real_affinity, generate_affinity_box
 from mseloss import Maploss
-
 
 
 from collections import OrderedDict
 from eval.script import getresult
-
 
 
 from PIL import Image
@@ -68,13 +64,7 @@ parser.add_argument('--gamma', default=0.1, type=float,
 parser.add_argument('--num_workers', default=32, type=int,
                     help='Number of workers used in dataloading')
 
-
 args = parser.parse_args()
-
-
-
-
-
 
 def copyStateDict(state_dict):
     if list(state_dict.keys())[0].startswith("module"):
@@ -101,7 +91,7 @@ def adjust_learning_rate(optimizer, gamma, step):
 
 if __name__ == '__main__':
 
-    dataloader = Synth80k('/data/CRAFT-pytorch/syntext/SynthText/SynthText', target_size = 768)
+    dataloader = Synth80k('dataset/SynthText', target_size = 768)
     train_loader = torch.utils.data.DataLoader(
         dataloader,
         batch_size=2,
@@ -113,19 +103,19 @@ if __name__ == '__main__':
     
     net = CRAFT()
 
-    net.load_state_dict(copyStateDict(torch.load('/data/CRAFT-pytorch/1-7.pth')))
+    net.load_state_dict(copyStateDict(torch.load('Pre-trained_model/CRAFT_clr_0.pth')))
     
     net = net.cuda()
 
 
 
-    net = torch.nn.DataParallel(net,device_ids=[0,1,2,3]).cuda()
+    net = torch.nn.DataParallel(net,device_ids=[0]).cuda()
     cudnn.benchmark = True
     net.train()
-    realdata = ICDAR2015(net, '/data/CRAFT-pytorch/icdar2015', target_size=768)
+    realdata = ICDAR2015(net, 'dataset/ICDAR2013', target_size=768)
     real_data_loader = torch.utils.data.DataLoader(
         realdata,
-        batch_size=10,
+        batch_size=2,
         shuffle=True,
         num_workers=0,
         drop_last=True,
@@ -144,7 +134,7 @@ if __name__ == '__main__':
     loss_time = 0
     loss_value = 0
     compare_loss = 1
-    for epoch in range(1000):
+    for epoch in range(1):
         train_time_st = time.time()
         loss_value = 0
         if epoch % 50 == 0 and epoch != 0:
@@ -152,6 +142,7 @@ if __name__ == '__main__':
             adjust_learning_rate(optimizer, args.gamma, step_index)
 
         st = time.time()
+        net.train()
         for index, (real_images, real_gh_label, real_gah_label, real_mask, _) in enumerate(real_data_loader):
             #real_images, real_gh_label, real_gah_label, real_mask = next(batch_real)
             syn_images, syn_gh_label, syn_gah_label, syn_mask, __ = next(batch_syn)
@@ -194,12 +185,11 @@ if __name__ == '__main__':
             #     compare_loss = loss
             #     torch.save(net.module.state_dict(),
             #                '/data/CRAFT-pytorch/real_weights/lower_loss.pth')
-
+        net.eval()
         print('Saving state, iter:', epoch)
         torch.save(net.module.state_dict(),
-                   '/data/CRAFT-pytorch/real_weights/CRAFT_clr_' + repr(epoch) + '.pth')
-        test('/data/CRAFT-pytorch/real_weights/CRAFT_clr_' + repr(epoch) + '.pth')
-        #test('/data/CRAFT-pytorch/craft_mlt_25k.pth')
+                   'epoch_weights/CRAFT_clr_' + repr(epoch) + '.pth')
+        test('epoch_weights/CRAFT_clr_' + repr(epoch) + '.pth')
         getresult()
         
 

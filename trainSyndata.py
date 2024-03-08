@@ -14,7 +14,6 @@ import torch.optim as optim
 import random
 import h5py
 import re
-import water
 from test import test
 
 
@@ -22,9 +21,9 @@ from math import exp
 from data_loader import ICDAR2015, Synth80k, ICDAR2013
 
 ###import file#######
-from augmentation import random_rot, crop_img_bboxes
-from gaussianmap import gaussion_transform, four_point_transform
-from generateheatmap import add_character, generate_target, add_affinity, generate_affinity, sort_box, real_affinity, generate_affinity_box
+# from augmentation import random_rot, crop_img_bboxes
+# from gaussianmap import gaussion_transform, four_point_transform
+# from generateheatmap import add_character, generate_target, add_affinity, generate_affinity, sort_box, real_affinity, generate_affinity_box
 from mseloss import Maploss
 
 
@@ -105,10 +104,10 @@ if __name__ == '__main__':
     # imgtxt = box['txt'][0]
 
     #dataloader = syndata(imgname, charbox, imgtxt)
-    dataloader = Synth80k('/data/CRAFT-pytorch/syntext/SynthText/SynthText', target_size = 768)
+    dataloader = Synth80k('dataset/SynthText', target_size = 768)
     train_loader = torch.utils.data.DataLoader(
         dataloader,
-        batch_size=16,
+        batch_size=8,
         shuffle=True,
         num_workers=0,
         drop_last=True,
@@ -120,7 +119,7 @@ if __name__ == '__main__':
     net = CRAFT()
     #net.load_state_dict(copyStateDict(torch.load('/data/CRAFT-pytorch/CRAFT_net_050000.pth')))
     #net.load_state_dict(copyStateDict(torch.load('/data/CRAFT-pytorch/1-7.pth')))
-    #net.load_state_dict(copyStateDict(torch.load('/data/CRAFT-pytorch/craft_mlt_25k.pth')))
+    net.load_state_dict(copyStateDict(torch.load('Pre-trained_model/CRAFT_clr_0.pth')))
     #net.load_state_dict(copyStateDict(torch.load('vgg16_bn-6c64b313.pth')))
     #realdata = realdata(net)
     # realdata = ICDAR2015(net, '/data/CRAFT-pytorch/icdar2015', target_size = 768)
@@ -135,7 +134,7 @@ if __name__ == '__main__':
     #net = CRAFT_net
 
     # if args.cdua:
-    net = torch.nn.DataParallel(net,device_ids=[0,1,2,3]).cuda()
+    net = torch.nn.DataParallel(net,device_ids=[0]).cuda()
     cudnn.benchmark = True
     # realdata = ICDAR2015(net, '/data/CRAFT-pytorch/icdar2015', target_size=768)
     # real_data_loader = torch.utils.data.DataLoader(
@@ -217,8 +216,8 @@ if __name__ == '__main__':
             if index % 5000 == 0 and index != 0:
                 print('Saving state, index:', index)
                 torch.save(net.module.state_dict(),
-                           '/data/CRAFT-pytorch/synweights/synweights_' + repr(index) + '.pth')
-                test('/data/CRAFT-pytorch/synweights/synweights_' + repr(index) + '.pth')
+                           'weights/synweights_' + repr(index) + '.pth')
+                test('weights/synweights_' + repr(index) + '.pth')
                 #test('/data/CRAFT-pytorch/craft_mlt_25k.pth')
                 getresult()
 

@@ -58,9 +58,9 @@ args = parser.parse_args()
 
 
 """ For test images in a folder """
-image_list, _, _ = file_utils.get_files('/data/CRAFT-pytorch/test')
+image_list, _, _ = file_utils.get_files('demo_images')
 
-result_folder = '/data/CRAFT-pytorch/result/'
+result_folder = 'result'
 if not os.path.isdir(result_folder):
     os.mkdir(result_folder)
 
@@ -138,7 +138,7 @@ def test(modelpara):
         # save score text
         filename, file_ext = os.path.splitext(os.path.basename(image_path))
         mask_file = result_folder + "/res_" + filename + '_mask.jpg'
-        #cv2.imwrite(mask_file, score_text)
+        cv2.imwrite(mask_file, score_text)
 
         file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
 

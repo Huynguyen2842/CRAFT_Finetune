@@ -428,7 +428,7 @@ class ICDAR2013(craft_base_dataset):
         super(ICDAR2013, self).__init__(target_size, viz, debug)
         self.net = net
         self.net.eval()
-        self.img_folder = os.path.join(icdar2013_folder, 'images/ch8_training_images')
+        self.img_folder = os.path.join(icdar2013_folder, 'images')
         self.gt_folder = os.path.join(icdar2013_folder, 'gt')
         imagenames = os.listdir(self.img_folder)
         self.images_path = []
@@ -481,10 +481,10 @@ class ICDAR2013(craft_base_dataset):
                 if words[i] == '###' or len(words[i].strip()) == 0:
                     continue
                 pursedo_bboxes, bbox_region_scores, confidence = self.inference_pursedo_bboxes(self.net, image,
-                                                                                               word_bboxes[i],
-                                                                                               words[i],
-                                                                                               gt_path,
-                                                                                               viz=self.viz)
+                                                                               word_bboxes[i],
+                                                                               words[i],
+                                                                               gt_path,
+                                                                               viz=self.viz if hasattr(self, 'viz') else None)
                 confidences.append(confidence)
                 cv2.fillPoly(confidence_mask, [np.int32(word_bboxes[i])], (confidence))
                 new_words.append(words[i])
@@ -535,8 +535,8 @@ class ICDAR2015(craft_base_dataset):
         super(ICDAR2015, self).__init__(target_size, viz, debug)
         self.net = net
         self.net.eval()
-        self.img_folder = os.path.join(icdar2015_folder, 'ch4_training_images')
-        self.gt_folder = os.path.join(icdar2015_folder, 'ch4_training_localization_transcription_gt')
+        self.img_folder = os.path.join(icdar2015_folder, 'images')
+        self.gt_folder = os.path.join(icdar2015_folder, 'gt')
         imagenames = os.listdir(self.img_folder)
         self.images_path = []
         for imagename in imagenames:

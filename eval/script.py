@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from collections import namedtuple
-from eval import rrc_evaluation_funcs
+import Polygon as plg
+import numpy as np
+import rrc_evaluation_funcs
 import importlib
 import zipfile
 import os
@@ -347,6 +349,6 @@ def eval_2015(res_folder):
 
 
 def getresult():
-    # rrc_evaluation_funcs.main_evaluation(None, default_evaluation_params, validate_data, evaluate_method)
+    rrc_evaluation_funcs.main_evaluation(None, default_evaluation_params, validate_data, evaluate_method)
     #eval_2015('../../test')
-    eval_2015('/data/CRAFT-pytorch/result')
+    eval_2015('result')

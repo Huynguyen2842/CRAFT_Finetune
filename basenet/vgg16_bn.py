@@ -2,7 +2,6 @@ from collections import namedtuple
 
 import torch
 from torchvision import models
-from torchvision.models.vgg import model_urls
 from torchutil import *
 import os
 
@@ -12,12 +11,11 @@ weights_folder = os.path.join(os.path.dirname(__file__) + '/../pretrain')
 class vgg16_bn(torch.nn.Module):
     def __init__(self, pretrained=True, freeze=False):
         super(vgg16_bn, self).__init__()
-        model_urls['vgg16_bn'] = model_urls['vgg16_bn'].replace('https://', 'http://')
         # vgg_pretrained_features = models.vgg16_bn(pretrained=pretrained).features
         vgg_pretrained_features = models.vgg16_bn(pretrained=False)
         if pretrained:
             vgg_pretrained_features.load_state_dict(
-                copyStateDict(torch.load(os.path.join(weights_folder, '/data/CRAFT-pytorch/vgg16_bn-6c64b313.pth'))))
+                copyStateDict(torch.load(os.path.join(weights_folder, 'vgg16_bn-6c64b313.pth'))))
         vgg_pretrained_features = vgg_pretrained_features.features
         self.slice1 = torch.nn.Sequential()
         self.slice2 = torch.nn.Sequential()
