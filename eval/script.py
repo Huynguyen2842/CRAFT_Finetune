@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from collections import namedtuple
-import Polygon as plg
-import numpy as np
-import rrc_evaluation_funcs
+from eval import rrc_evaluation_funcs
 import importlib
 import zipfile
 import os
@@ -343,12 +341,15 @@ def eval_2015(res_folder):
         zip.write(filepath, filename)
     zip.close()
     gtfile = os.path.join(current_folder, 'gt.zip')
+    print(gtfile)
     params['g'] = gtfile
     params['s'] = submitfile
     rrc_evaluation_funcs.main_evaluation(params, default_evaluation_params, validate_data, evaluate_method)
 
-
 def getresult():
-    rrc_evaluation_funcs.main_evaluation(None, default_evaluation_params, validate_data, evaluate_method)
+    # rrc_evaluation_funcs.main_evaluation(None, default_evaluation_params, validate_data, evaluate_method)
     #eval_2015('../../test')
-    eval_2015('result')
+    eval_2015('/home/ubuntu/HuyAI/CRAFT_Finetune/result')
+
+
+getresult()
